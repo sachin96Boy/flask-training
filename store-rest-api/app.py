@@ -33,7 +33,15 @@ def create_store():
 # The <> brackets tell Flask that the part of the URL that is inside the brackets is a variable, and that we want to pass it as a parameter to our function.
 # The <string:name> part tells Flask that the variable will be a string.
 def get_store(name):
-    pass
+    # iterate over stores
+    # if the store name matches, return it 
+    # if none match, return an error message
+    for store in stores:
+        if store['name'] == name:
+            return jsonify(store)
+    return jsonify({'message': 'store not found'})
+    
+    
 
 @app.route('/store')
 def get_stores():
@@ -41,11 +49,23 @@ def get_stores():
 
 @app.route('/store/<string:name>/item', methods=['POST'])
 def create_item_in_store(name):
-    pass
+    request_data = request.get_json()
+    for store in stores:
+        if store['name'] == name:
+            new_item = {
+                'name': request_data['name'],
+                'price': request_data['price']
+            }
+            store['items'].append(new_item)
+            return jsonify(new_item)
+    return jsonify({'message': 'store not found'})
 
 @app.route('/store/<string:name>/item')
 def get_items_in_store(name):
-    pass
+    for store in stores:
+        if store['name'] == name:
+            return jsonify({'items': store['items']})
+    return jsonify({'message': 'store not found'})
 
 
 app.run(port=5000)
