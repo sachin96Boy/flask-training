@@ -18,8 +18,16 @@ stores = [
 
 
 @app.route('/store', methods=['POST'])
+# POST - used to receive data
+#create a store with a given name
 def create_store():
-    pass
+    request_data = request.get_json()
+    new_store = {
+        'name': request_data['name'],
+        'items': []
+    }
+    stores.append(new_store)
+    return jsonify(new_store)
 
 @app.route('/store/<string:name>')
 # The <> brackets tell Flask that the part of the URL that is inside the brackets is a variable, and that we want to pass it as a parameter to our function.
