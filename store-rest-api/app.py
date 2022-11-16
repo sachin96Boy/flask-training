@@ -16,6 +16,10 @@ stores = [
 ]
 
 
+@app.route('/')
+def home():
+    return render_template('index.html')
+
 
 @app.route('/store', methods=['POST'])
 # POST - used to receive data

@@ -1,0 +1,35 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Store REST API</title>
+        <script type="text/javascript">
+            function getItems() {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/store", true);
+                xhr.onload = function (e) {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            console.log(xhr.responseText);
+                        } else {
+                            console.error(xhr.statusText);
+                        }
+                    }
+                };
+                xhr.onerror = function (e) {
+                    console.error(xhr.statusText);
+                };
+                xhr.send(null);
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Store REST API</h1>
+        <p>Version 1.0</p>
+        <button type="button" onclick="getItems()">Get Items</button>
+        <div id="myElement">
+            Hello, world! I am a DIV.
+        </div>
+
+    </body>
+</html>
