@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 flask-restful = "*"
+flask-jwt = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
