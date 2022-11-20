@@ -14,6 +14,7 @@ api = Api(app)
 
 jwt = JWT(app, authenticate, identity)  # /auth
 # in python 3.10, it gives an import error for jwt_required
+# so i downgraded to  ver 3.7 to see if it work
 
 items = []
 
