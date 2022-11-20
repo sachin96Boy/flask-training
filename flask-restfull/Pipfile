@@ -7,6 +7,8 @@ name = "pypi"
 flask-restful = "*"
 flask-jwt = "*"
 python-dotenv = "*"
+werkzeug = "~=2.0.0"
+jinja2 = "~=3.0.3"
 
 [dev-packages]
 
