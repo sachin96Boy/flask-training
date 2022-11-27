@@ -1,6 +1,7 @@
 import sqlite3
 from  flask_restful  import  Resource ,  reqparse
 from flask_jwt import jwt_required
+from modals.item import ItemModel
 
 
 class Item(Resource):
@@ -8,61 +9,24 @@ class Item(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('price', type=float, required=True, help="This field cannot be left blank!")
 
-
-    @classmethod
-    def find_by_name(cls, name):
-        connection = sqlite3.connect('test.db')
-        cursor = connection.cursor()
-
-        query = "SELECT * FROM items WHERE name=?"
-        result = cursor.execute(query, (name,))
-
-        row = result.fetchone()
-        connection.close()
-
-        if row:
-            return {'item': {'name': row[0], 'price': row[1]}}
-
-    @classmethod
-    def insert(cls, item):
-        connection = sqlite3.connect('test.db')
-        cursor = connection.cursor()
-
-        query = "INSERT INTO items VALUES (?, ?)"
-        cursor.execute(query, (item['name'], item['price']))
-
-        connection.commit()
-        connection.close()
-    
-    @classmethod
-    def update(cls, item):
-        connection = sqlite3.connect('test.db')
-        cursor = connection.cursor()
-
-        query = "UPDATE items SET price=? WHERE name=?"
-        cursor.execute(query, (item['price'], item['name']))
-
-        connection.commit()
-        connection.close()
-
     @jwt_required()
     def get(self, name):
         try:
-            item = self.find_by_name(name)
+            item = ItemModel.find_by_name(name)
         except:
             return {"message": "An error occurred finding the item."}, 500
         if item:
-            return item
+            return item.json()
         return {'message': 'Item not found'}, 404
 
     def post(self, name):
-        if self.find_by_name(name):
+        if ItemModel.find_by_name(name):
             return {'message': "An item with name '{}' already exists.".format(name)}, 400
         request_data = Item.parser.parse_args()
-        item = {'name': name, 'price': request_data['price']}
+        item = ItemModel(name, request_data['price'])
         
         try:
-            self.insert(item)
+            item.insert()
         except:
             return {"message": "An error occurred inserting the item."}, 500
         
@@ -85,24 +49,24 @@ class Item(Resource):
         
         request_data = Item.parser.parse_args()
 
-        item = self.find_by_name(name)
-        updated_item = {'name': name, 'price': request_data['price']}
+        item = ItemModel.find_by_name(name)
+        updated_item = ItemModel(name, request_data['price'])
         if item is None:
             try:
-                self.insert(updated_item)
+                updated_item.insert()
             except:
                 return {"message": "An error occurred inserting the item."}, 500
         else:
             try:
-                self.update(updated_item)
+                updated_item.update()
             except:
                 return {"message": "An error occurred updating the item."}, 500
-        return updated_item
+        return updated_item.json()
+
 
 class ItemList(Resource):
 
-    @classmethod
-    def get(cls):
+    def get(self):
         connection = sqlite3.connect('test.db')
         cursor = connection.cursor()
 
@@ -115,6 +79,3 @@ class ItemList(Resource):
 
         connection.close()
         return {'items': items}
-
-    def get(self):
-        return self.get()
