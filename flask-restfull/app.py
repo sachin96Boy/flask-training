@@ -5,6 +5,7 @@ from flask_jwt import JWT, jwt_required
 import os
 
 from security import authenticate, identity
+from user import UserRegister
 
 load_dotenv()  # take environment variables from .env.
 
@@ -60,6 +61,7 @@ class ItemList(Resource):
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
+api.add_resource(UserRegister, '/register')
 # this endpoint will be /student/<string:name> 
 
 app.run(port=5000, debug=True)
