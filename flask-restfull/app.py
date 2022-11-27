@@ -11,6 +11,8 @@ from resources.item import Item, ItemList
 load_dotenv()  # take environment variables from .env.
 
 app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///test.db")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.getenv("SECREAT_KEY")
 api = Api(app)
 
@@ -23,6 +25,12 @@ api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
 api.add_resource(UserRegister, '/register')
 # this endpoint will be /student/<string:name> 
+
+# we are importing db hre
+# because of circular imports 
+
+from db import db
+db.init_app(app)
 
 app.run(port=5000, debug=True)
 
