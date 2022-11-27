@@ -5,8 +5,8 @@ from flask_jwt import JWT
 import os
 
 from security import authenticate, identity
-from user import UserRegister
-from item import Item, ItemList
+from resources.user import UserRegister
+from resources.item import Item, ItemList
 
 load_dotenv()  # take environment variables from .env.
 
