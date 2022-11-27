@@ -16,6 +16,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.getenv("SECREAT_KEY")
 api = Api(app)
 
+# this is a special decorarter that will create the tables in the database
+#it'll run before the first request
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 jwt = JWT(app, authenticate, identity)  # /auth
 # in python 3.10, it gives an import error for jwt_required
 # so i downgraded to  ver 3.7 to see if it work
