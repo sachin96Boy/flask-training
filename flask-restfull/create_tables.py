@@ -10,6 +10,17 @@ create_table = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, userna
 cursor.execute(create_table)
 print("Table created successfully")
 
+# create items table
+create_table = "CREATE TABLE IF NOT EXISTS items (name text, price real)"
+cursor.execute(create_table)
+print("Table created successfully")
+
+#insert dummy values for testing 
+insert_query = "INSERT INTO items VALUES ('test', 10.21)"
+cursor.execute(insert_query)
+
+
+
 
 connection.commit()
 
