@@ -7,6 +7,7 @@ import os
 from security import authenticate, identity
 from resources.user import UserRegister
 from resources.item import Item, ItemList
+from resources.store import Store, StoreList
 
 load_dotenv()  # take environment variables from .env.
 
@@ -27,8 +28,11 @@ jwt = JWT(app, authenticate, identity)  # /auth
 # so i downgraded to  ver 3.7 to see if it work
 
 
+api.add_resource(Store, '/store/<string:name>')
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
+api.add_resource(StoreList, '/stores')
+
 api.add_resource(UserRegister, '/register')
 # this endpoint will be /student/<string:name> 
 
