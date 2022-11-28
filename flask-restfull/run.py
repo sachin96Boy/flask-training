@@ -1,3 +1,5 @@
+# only run in server where you define wsgi file
+
 from app import app
 from db import db
 
