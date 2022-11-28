@@ -20,7 +20,7 @@ class StoreModel(db.Model):
         # sotre and items share an one to many relationship
         # so we can use the back reference to get all the items
         # that belong to this store
-        return {'name': self.name, 'items': [item.json() for item in self.items.all()]}
+        return {'id':self.id, 'name': self.name, 'items': [item.json() for item in self.items.all()]}
 
     @classmethod
     def find_by_name(cls, name):
