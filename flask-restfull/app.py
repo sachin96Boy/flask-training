@@ -1,66 +1,56 @@
-from flask import Flask, jsonify, request, render_template
-from flask_restful import Resource, Api, reqparse
+from flask import Flask
+from flask_restful import  Api 
 from dotenv import load_dotenv
-from flask_jwt import JWT, jwt_required
+from flask_jwt_extended import JWTManager
 import os
 
-from security import authenticate, identity
+
+from resources.user import UserRegister, User, UserLogin
+from resources.item import Item, ItemList
+from resources.store import Store, StoreList
 
 load_dotenv()  # take environment variables from .env.
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECREAT_KEY")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///test.db")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['JWT_SECRET_KEY'] = os.getenv("SECREAT_KEY")
 api = Api(app)
 
-jwt = JWT(app, authenticate, identity)  # /auth
+# this is a special decorarter that will create the tables in the database
+#it'll run before the first request
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+jwt = JWTManager(app)  # /auth endpoint is only used in flask-jwt not in flask-jwt-extended
 # in python 3.10, it gives an import error for jwt_required
 # so i downgraded to  ver 3.7 to see if it work
 
-items = []
-
-class Item(Resource):
-
-    parser = reqparse.RequestParser()
-    parser.add_argument('price', type=float, required=True, help="This field cannot be left blank!")
-
-    @jwt_required()
-    def get(self, name):
-        item = next(filter(lambda x: x['name'] == name, items), None)
-        return {'item': item}, 200 if item else 404
-
-    def post(self, name):
-        if next(filter(lambda x: x['name'] == name, items), None):
-            return {'message': "An item with name '{}' already exists.".format(name)}, 400
-        request_data = Item.parser.parse_args()
-        item = {'name': name, 'price': request_data['price']}
-        items.append(item)
-        return item, 201
-
-    def delete(self, name):
-        global items
-        items = list(filter(lambda x: x['name'] != name, items))
-        return {'message': 'Item deleted'}
-
-    def put(self, name):
-        
-        request_data = Item.parser.parse_args()
-
-        item = next(filter(lambda x: x['name'] == name, items), None)
-        if item is None:
-            item = {'name': name, 'price': request_data['price']}
-            items.append(item)
-        else:
-            item.update(request_data)
-        return item
-
-class ItemList(Resource):
-    def get(self):
-        return {'items': items}
+@jwt.user_identity_loader
+def add_claims_to_jwt(identity):
+    if identity == 1:
+        return {'is_admin': True}
+    return {'is_admin': False}    
 
 
+
+api.add_resource(Store, '/store/<string:name>')
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
+api.add_resource(StoreList, '/stores')
+
+api.add_resource(UserRegister, '/register')
+api.add_resource(User, '/user/<int:user_id>')
+api.add_resource(UserLogin, '/login')
 # this endpoint will be /student/<string:name> 
+
+# we are importing db hre
+# because of circular imports 
+
+from db import db
+db.init_app(app)
 
 app.run(port=5000, debug=True)
 
